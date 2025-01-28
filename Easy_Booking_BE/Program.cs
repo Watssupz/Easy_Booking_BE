@@ -1,5 +1,6 @@
 using AutoMapper;
 using Easy_Booking_BE.Data;
+using Easy_Booking_BE.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,7 @@ builder.Services.AddDbContext<EasyBookingBEContext>(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(Program));
-
+builder.Services.AddScoped<IPayment_StatusRepository, Payment_StatusRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
