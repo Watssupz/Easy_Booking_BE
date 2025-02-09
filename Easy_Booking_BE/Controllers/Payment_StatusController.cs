@@ -9,6 +9,7 @@ using EasyBooking.Data;
 using Easy_Booking_BE.Data;
 using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Easy_Booking_BE.Controllers
 {
@@ -55,8 +56,12 @@ namespace Easy_Booking_BE.Controllers
                 var ps = await _payment_StatusRepository.GetPayment_StatusById(id);
                 if (ps != null)
                 {
-                    await _payment_StatusRepository.UpdatePayment_Status(id, payment_Status);
-                    return Ok();    
+                    if (id == payment_Status.payment_id)
+                    {
+                        await _payment_StatusRepository.UpdatePayment_Status(id, payment_Status);
+                        return Ok();
+                    }
+                    return NotFound();
                 }
                 return BadRequest("Payment_Status not found");                
             }
@@ -74,6 +79,10 @@ namespace Easy_Booking_BE.Controllers
             try
             {
                 var new_ps = await _payment_StatusRepository.AddPayment_Status(payment_Status);
+                if (new_ps == -1)
+                {
+                    return Conflict("Payment status already exists."); // HTTP 409 Conflict
+                }
                 var nps = await _payment_StatusRepository.GetPayment_StatusById(new_ps);
                 return nps == null ? NotFound() : Ok(nps);
             }

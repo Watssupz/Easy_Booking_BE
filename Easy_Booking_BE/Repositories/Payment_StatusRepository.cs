@@ -10,13 +10,13 @@ public class Payment_StatusRepository : IPayment_StatusRepository
 {
     private readonly EasyBookingBEContext _context;
     private readonly IMapper _mapper;
-    
+
     public Payment_StatusRepository(EasyBookingBEContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
-    
+
     public async Task<List<Payment_StatusModel>> GetAllPayment_Status()
     {
         var ps = await _context.Payment_Status!.ToListAsync();
@@ -31,20 +31,33 @@ public class Payment_StatusRepository : IPayment_StatusRepository
 
     public async Task<int> AddPayment_Status(Payment_StatusModel payment_Status)
     {
-        var newPayment_Status = _mapper.Map<Payment_Status>(payment_Status);
-        _context.Payment_Status!.Add(newPayment_Status);
-        await _context.SaveChangesAsync();
-        return newPayment_Status.payment_id;
+        try
+        {
+            var exist_ps = await _context.Payment_Status.FirstOrDefaultAsync(ps => ps.payment_status_name == payment_Status.payment_status_name);
+            if (exist_ps != null)
+            {
+                throw new InvalidOperationException("Payment status already exists.");
+            }
+            var newPayment_Status = _mapper.Map<Payment_Status>(payment_Status);
+            _context.Payment_Status!.Add(newPayment_Status);
+            await _context.SaveChangesAsync();
+            return newPayment_Status.payment_id;
+        }
+        catch (DbUpdateException ex)
+        {
+            return -1;
+        }
     }
 
     public async Task UpdatePayment_Status(int id, Payment_StatusModel payment_Status)
     {
-        if (id == payment_Status.payment_id)
+        var updatePS = await _context.Payment_Status!.FindAsync(id);
+        if (updatePS != null)
         {
-            var updatePS = _mapper.Map<Payment_Status>(payment_Status);
+            updatePS.payment_status_name = payment_Status.payment_status_name;
             _context.Payment_Status!.Update(updatePS);
             await _context.SaveChangesAsync();
-        }   
+        }
     }
 
     public async Task DeletePayment_Status(int id)
