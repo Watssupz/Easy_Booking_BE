@@ -1,9 +1,10 @@
 ﻿using EasyBooking.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Easy_Booking_BE.Data
 {
-    public class EasyBookingBEContext : DbContext
+    public class EasyBookingBEContext : IdentityDbContext<ApplicationUser>
     {
 
         public EasyBookingBEContext(DbContextOptions<EasyBookingBEContext> options) : base(options) { }
