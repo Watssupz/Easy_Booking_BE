@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EasyBooking.Data;
 using Easy_Booking_BE.Data;
+using Easy_Booking_BE.Data.Constants;
 using Easy_Booking_BE.Models;
+using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
 using Microsoft.AspNetCore.Authorization;
 
@@ -48,68 +50,84 @@ namespace Easy_Booking_BE.Controllers
 
         // PUT: api/Payment_Status/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> UpdatePayment_Status(int id, Payment_StatusModel payment_Status)
         {
-            try
+            var ps = await _payment_StatusRepository.GetPayment_StatusById(id);
+            if (ps != null)
             {
-                var ps = await _payment_StatusRepository.GetPayment_StatusById(id);
-                if (ps != null)
+                if (id == payment_Status.payment_id)
                 {
-                    if (id == payment_Status.payment_id)
-                    {
-                        await _payment_StatusRepository.UpdatePayment_Status(id, payment_Status);
-                        return Ok();
-                    }
-                    return NotFound();
+                    // await _payment_StatusRepository.UpdatePayment_Status(id, payment_Status);
+                    return Ok(await _payment_StatusRepository.UpdatePayment_Status(id, payment_Status));
                 }
-                return BadRequest("Payment_Status not found");                
+                return BadRequest(
+                    new BaseDataResponse<object>
+                    (
+                        statusCode: 400,
+                        message: Constants.NOT_MATCH
+                    )
+                );
             }
-            catch
-            {
-                return BadRequest();
-            }
+            return NotFound(
+                new BaseDataResponse<object>
+                (
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                )
+            );
         }
 
         // POST: api/Payment_Status
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost("Create")]
         public async Task<IActionResult> CreatePayment_Status(Payment_StatusModel payment_Status)
         {
-            try
+            if (payment_Status == null)
             {
-                var new_ps = await _payment_StatusRepository.AddPayment_Status(payment_Status);
-                if (new_ps == -1)
-                {
-                    return Conflict("Payment status already exists."); // HTTP 409 Conflict
-                }
-                var nps = await _payment_StatusRepository.GetPayment_StatusById(new_ps);
-                return nps == null ? NotFound() : Ok(nps);
+                return BadRequest
+                (
+                    new BaseDataResponse<object>
+                    (
+                        statusCode: 400,
+                        message: Constants.NOT_FOUND
+                    )
+                );
             }
-            catch
+            var result = await _payment_StatusRepository.AddPayment_Status(payment_Status);
+            if (result.StatusCode == 200)
             {
-                return BadRequest();
+                return Ok(result);
             }
+            return BadRequest
+            (
+                new BaseDataResponse<object>
+                (
+                    statusCode: 400,
+                    message: Constants.ALREADY_EXSIST
+                )
+            );
         }
 
         // DELETE: api/Payment_Status/5
+        [Authorize]
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeletePayment_Status(int id)
         {
-            try
+            var ps = await _payment_StatusRepository.GetPayment_StatusById(id);
+            if (ps.Data != null)
             {
-                var ps = await _payment_StatusRepository.GetPayment_StatusById(id);
-                if (ps != null)
-                {
-                    await _payment_StatusRepository.DeletePayment_Status(id);
-                    return Ok();    
-                }
-                return BadRequest("Payment_Status not found");
+                return Ok(await _payment_StatusRepository.DeletePayment_Status(id));
             }
-            catch
-            {
-                return BadRequest();
-            }
+            return BadRequest(
+                new BaseDataResponse<object>
+                (
+                    statusCode: 400,
+                    message: Constants.NOT_FOUND
+                )
+            );
         }
 
     }
