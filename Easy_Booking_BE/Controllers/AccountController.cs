@@ -1,4 +1,6 @@
-﻿using Easy_Booking_BE.Models;
+﻿using Easy_Booking_BE.Data.Constants;
+using Easy_Booking_BE.Models;
+using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +9,11 @@ namespace Easy_Booking_BE.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AC : ControllerBase
+    public class ACController : ControllerBase
     {
         private readonly IAccountRepository _accountRepo;
 
-        public AC(IAccountRepository repo)
+        public ACController(IAccountRepository repo)
         {
             _accountRepo = repo;
         }
@@ -21,28 +23,28 @@ namespace Easy_Booking_BE.Controllers
         {
             if(model.password != model.confirm_password)
             {
-                return BadRequest();
+                return BadRequest(
+                    new BaseDataResponse<object>
+                    (
+                        statusCode: 400,
+                        message: Constants.ERROR
+                    )
+                );
             }
 
             var result = await _accountRepo.SignUpAsync(model);
-            if (result.Succeeded)
-            {
-                return Ok(result.Succeeded);
-            }
-
-            return Unauthorized();
+            return result.StatusCode == 200 ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("SignIn")]
         public async Task<IActionResult> SignIn(SignInModel model)
         {
-            var result = await _accountRepo.SignInAsync(model);
-            if (string.IsNullOrEmpty(result))
+            var response = await _accountRepo.SignInAsync(model);
+            if (response.StatusCode == 400)
             {
-                return Unauthorized();
+                return BadRequest(response);
             }
-            return Ok(result);
-
+            return Ok(response);
         }
     }
 }

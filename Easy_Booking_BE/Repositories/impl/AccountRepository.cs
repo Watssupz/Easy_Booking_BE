@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Easy_Booking_BE.Models.Response;
+using Easy_Booking_BE.Data.Constants;
 
 namespace Easy_Booking_BE.Repositories
 {
@@ -21,12 +23,17 @@ namespace Easy_Booking_BE.Repositories
             _configuration = configuration;
         }
 
-        public async Task<string> SignInAsync(SignInModel signInModel)
+        public async Task<BaseDataResponse<string>> SignInAsync(SignInModel signInModel)
         {
             var result = await _signInManager.PasswordSignInAsync(signInModel.email, signInModel.password, false, false);
             if(!result.Succeeded)
             {
-                return String.Empty;
+                return new BaseDataResponse<string>
+                    (
+                        statusCode: 400, 
+                        message: Constants.ERROR, 
+                        data: null
+                    );
             }
             var authenticationClaims = new List<Claim>
             {
@@ -43,11 +50,18 @@ namespace Easy_Booking_BE.Repositories
                 claims: authenticationClaims,
                 signingCredentials: new SigningCredentials(authenticationKey, SecurityAlgorithms.HmacSha512Signature)
             );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            return new BaseDataResponse<string>
+                (
+                    statusCode: 200,
+                    message: Constants.SUCCESSFUL,
+                    data: tokenString
+                );
 
         }
 
-        public async Task<IdentityResult> SignUpAsync(SignUpModel signUpModel)
+        public async Task<BaseDataResponse<IdentityResult>> SignUpAsync(SignUpModel signUpModel)
         {
             var user = new ApplicationUser
             {
@@ -56,8 +70,12 @@ namespace Easy_Booking_BE.Repositories
                 Email = signUpModel.email,
                 UserName = signUpModel.email,
             };
-            return await _userManager.CreateAsync(user, signUpModel.password);
-
+            var result = await _userManager.CreateAsync(user, signUpModel.password);
+            return new BaseDataResponse<IdentityResult>
+            (
+                statusCode: result.Succeeded ? 200 : 400,
+                message: result.Succeeded ? Constants.SUCCESSFUL : Constants.ERROR
+            );
         }
     }
 }
