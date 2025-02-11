@@ -71,7 +71,7 @@ public class Room_StatusRepository : IRoom_StatusRepository
         {
             return new BaseDataResponse<object>(
                 statusCode: 500,
-                message: Constants.UPDATE_ERROR
+                message: Constants.ERROR
             );
         }
     }

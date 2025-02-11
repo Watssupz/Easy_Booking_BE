@@ -55,12 +55,12 @@ namespace Easy_Booking_BE.Controllers
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> UpdateRoom_Status(int id, [FromBody] Room_StatusModel model)
         {
-            var rs = await _roomStatusRepository.UpdateRoom_Status(id, model);
+            var rs = await _roomStatusRepository.GetRoom_StatusById(id);
             if (rs != null)
             {
                 if (id == model.room_status_id)
                 {
-                    return Ok(rs);
+                    return Ok(await _roomStatusRepository.UpdateRoom_Status(id, model));
                 }
 
                 return BadRequest(
