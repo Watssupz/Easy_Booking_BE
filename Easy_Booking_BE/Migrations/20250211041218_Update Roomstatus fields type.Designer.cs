@@ -4,6 +4,7 @@ using Easy_Booking_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Easy_Booking_BE.Migrations
 {
     [DbContext(typeof(EasyBookingBEContext))]
-    partial class EasyBookingBEContextModelSnapshot : ModelSnapshot
+    [Migration("20250211041218_Update Roomstatus fields type")]
+    partial class UpdateRoomstatusfieldstype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,9 +197,8 @@ namespace Easy_Booking_BE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("floor_id"), 1L, 1);
 
-                    b.Property<string>("floor_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("floor_name")
+                        .HasColumnType("int");
 
                     b.HasKey("floor_id");
 
@@ -300,9 +301,8 @@ namespace Easy_Booking_BE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("room_status_id"), 1L, 1);
 
-                    b.Property<string>("room_status_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("room_status_name")
+                        .HasColumnType("int");
 
                     b.HasKey("room_status_id");
 

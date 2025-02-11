@@ -10,5 +10,5 @@ public class Room_Status
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int room_status_id { get; set; }
-    public int room_status_name { get; set; }
+    public string room_status_name { get; set; }
 }

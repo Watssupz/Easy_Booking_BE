@@ -9,5 +9,5 @@ public class Floor
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int floor_id { get; set; }
-    public int floor_name { get; set; }
+    public string floor_name { get; set; }
 }
