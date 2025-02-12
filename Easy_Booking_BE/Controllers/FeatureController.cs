@@ -7,6 +7,7 @@ using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
 using EasyBooking.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +36,8 @@ namespace Easy_Booking_BE.Controllers
             var result = await _featureRepository.GetFeatureByIdAsync(id);
             return result != null ? Ok(result) : NotFound();
         }
-
+        
+        [Authorize]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateFeature([FromBody] FeatureModel model)
         {
@@ -47,6 +49,7 @@ namespace Easy_Booking_BE.Controllers
             return BadRequest(result);
         }
 
+        [Authorize]
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> UpdateFeature(int id, [FromBody] FeatureModel model)
         {
@@ -72,8 +75,8 @@ namespace Easy_Booking_BE.Controllers
             );
         }
 
+        [Authorize]
         [HttpDelete("Delete/{id}")]
-
         public async Task<IActionResult> DeleteFeature(int id)
         {
             var f = await _featureRepository.GetFeatureByIdAsync(id);
