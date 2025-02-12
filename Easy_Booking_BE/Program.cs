@@ -32,6 +32,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IRoom_StatusRepository, Room_StatusRepository>();
 builder.Services.AddScoped<IBooking_StatusRepository, Booking_StatusRepository>();
 builder.Services.AddScoped<IFeatureRepository, FeatureRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 
 
 builder.Services.AddAuthentication(option =>

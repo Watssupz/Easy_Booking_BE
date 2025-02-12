@@ -15,6 +15,7 @@ public class ApplicationHelper : Profile
         CreateMap<Room_Status, Room_StatusModel>().ReverseMap();
         CreateMap<Booking_Status, Booking_StatusModel>().ReverseMap();
         CreateMap<Feature, FeatureModel>().ReverseMap();
+        CreateMap<Location, LocationModel>().ReverseMap();
     }
     
 }
