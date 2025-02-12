@@ -9,5 +9,5 @@ public class Feature
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int feature_id { get; set; }
-    public int feature_name { get; set; }
+    public string feature_name { get; set; }
 }
