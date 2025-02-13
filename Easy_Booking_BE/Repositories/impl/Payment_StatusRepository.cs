@@ -24,9 +24,9 @@ public class Payment_StatusRepository : IPayment_StatusRepository
         var ps = await _context.Payment_Status!.ToListAsync();
         var mappedData = _mapper.Map<List<Payment_StatusModel>>(ps);
         return new BaseDataResponse<List<Payment_StatusModel>>(
-            statusCode: 200,
-            message: Constants.SUCCESSFUL,
-            data: mappedData != null && mappedData.Any() ? mappedData : new List<Payment_StatusModel>()
+            statusCode: mappedData.Any() ? 200 : 404,
+            message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
+            data: mappedData.Any() ? mappedData : new List<Payment_StatusModel>()
         );
     }
 
@@ -35,8 +35,7 @@ public class Payment_StatusRepository : IPayment_StatusRepository
         var ps = await _context.Payment_Status!.FindAsync(id);
         return new BaseDataResponse<Payment_StatusModel>
         (
-            // statusCode: ps != null ? 200 : 400,
-            statusCode: 200,
+            statusCode: ps != null ? 200 : 404,
             message: ps != null ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
             data: ps != null ? _mapper.Map<Payment_StatusModel>(ps) : null
         );
@@ -51,54 +50,60 @@ public class Payment_StatusRepository : IPayment_StatusRepository
             if (exist_ps != null)
             {
                 return new BaseDataResponse<object>(
-                    statusCode: 400,
-                    message: Constants.ALREADY_EXSIST,
-                    data: exist_ps
+                    statusCode: 200,
+                    message: Constants.ALREADY_EXSIST
                 );
             }
 
-            var newPayment_Status = _mapper.Map<Payment_Status>(payment_Status);
-            _context.Payment_Status!.Add(newPayment_Status);
+            var newPaymentStatus = _mapper.Map<Payment_Status>(payment_Status);
+            _context.Payment_Status!.Add(newPaymentStatus);
             await _context.SaveChangesAsync();
             return new BaseDataResponse<object>(
                 statusCode: 200,
                 message: Constants.SUCCESSFUL,
-                data: newPayment_Status
+                data: newPaymentStatus
             );
         }
         catch (DbUpdateException ex)
         {
             return new BaseDataResponse<object>(
                 statusCode: 500,
-                message: Constants.UPDATE_ERROR
+                message: Constants.ERROR
             );
         }
     }
 
-    public async Task<BaseDataResponse<object>> UpdatePayment_Status(int id, Payment_StatusModel payment_Status)
+    public async Task<BaseDataResponse<object>> UpdatePayment_Status(int id, Payment_StatusModel paymentStatus)
     {
-        var updatePS = await _context.Payment_Status!.FindAsync(id);
-        if (updatePS != null)
+        var updatePs = await _context.Payment_Status!.FindAsync(id);
+        if (updatePs != null)
         {
-            var existPS = await _context.Payment_Status.FirstOrDefaultAsync(ps =>
-                ps.payment_status_name == payment_Status.payment_status_name && ps.payment_id != id);
-
-            if (existPS != null)
+            if (id == paymentStatus.payment_id)
             {
-                return new BaseDataResponse<object>(
-                    statusCode: 400,
-                    message: Constants.ALREADY_EXSIST
+                var existPs = await _context.Payment_Status.FirstOrDefaultAsync(ps =>
+                    ps.payment_status_name == paymentStatus.payment_status_name && ps.payment_id != id);
+
+                if (existPs != null)
+                {
+                    return new BaseDataResponse<object>(
+                        statusCode: 200,
+                        message: Constants.ALREADY_EXSIST
+                    );
+                }
+
+                updatePs.payment_status_name = paymentStatus.payment_status_name;
+                _context.Payment_Status!.Update(updatePs);
+                await _context.SaveChangesAsync();
+                return new BaseDataResponse<object>
+                (
+                    statusCode: 200,
+                    message: Constants.SUCCESSFUL,
+                    data: updatePs
                 );
             }
-
-            updatePS.payment_status_name = payment_Status.payment_status_name;
-            _context.Payment_Status!.Update(updatePS);
-            await _context.SaveChangesAsync();
-            return new BaseDataResponse<object>
-            (
+            return new BaseDataResponse<object>(
                 statusCode: 200,
-                message: Constants.UPDATE_SUCCESS,
-                data: updatePS
+                message: Constants.NOT_MATCH
             );
         }
 
@@ -111,10 +116,10 @@ public class Payment_StatusRepository : IPayment_StatusRepository
 
     public async Task<BaseDataResponse<object>> DeletePayment_Status(int id)
     {
-        var deletePS = _context.Payment_Status!.FirstOrDefault(ps => ps.payment_id == id);
-        if (deletePS != null)
+        var deletePs = _context.Payment_Status!.FirstOrDefault(ps => ps.payment_id == id);
+        if (deletePs != null)
         {
-            _context.Payment_Status!.Remove(deletePS);
+            _context.Payment_Status!.Remove(deletePs);
             await _context.SaveChangesAsync();
             return new BaseDataResponse<object>
             (
@@ -122,6 +127,7 @@ public class Payment_StatusRepository : IPayment_StatusRepository
                 message: Constants.SUCCESSFUL
             );
         }
+
         return new BaseDataResponse<object>
         (
             statusCode: 404,

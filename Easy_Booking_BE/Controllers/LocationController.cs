@@ -6,6 +6,7 @@ using Easy_Booking_BE.Data.Constants;
 using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,11 @@ namespace Easy_Booking_BE.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LocationController : ControllerBase
+    public class LController : ControllerBase
     {
         private readonly ILocationRepository _locationRepository;
 
-        public LocationController(ILocationRepository locationRepository)
+        public LController(ILocationRepository locationRepository)
         {
             _locationRepository = locationRepository;
         }
@@ -36,20 +37,23 @@ namespace Easy_Booking_BE.Controllers
             return location.StatusCode == 200 ? Ok(location) : NotFound(location);
         }
 
+        [Authorize]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateLocation([FromBody] LocationModel location)
         {
             var result = await _locationRepository.CreateLocationAsync(location);
-            return result.StatusCode == 200 ? Ok(result) : NotFound(result);
+            return result.StatusCode == 200 ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPut("Update")]
+        [Authorize]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> UpdateLocations(int id, [FromBody] LocationModel models)
         {
             var result = await _locationRepository.UpdateLocationAsync(id, models);
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
 
+        [Authorize]
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteLocation(int id)
         {

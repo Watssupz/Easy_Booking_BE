@@ -25,9 +25,9 @@ public class Booking_StatusRepository : IBooking_StatusRepository
         var mappedData = _mapper.Map<List<Booking_StatusModel>>(bs);
         return new BaseDataResponse<List<Booking_StatusModel>>
         (
-            statusCode: 200,
-            message: Constants.SUCCESSFUL,
-            data: mappedData != null && mappedData.Any() ? mappedData : new List<Booking_StatusModel>()
+            statusCode: mappedData.Any() ? 200 : 404,
+            message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
+            data: mappedData.Any() ? mappedData : new List<Booking_StatusModel>()
         );
     }
 
@@ -35,7 +35,7 @@ public class Booking_StatusRepository : IBooking_StatusRepository
     {
         var bs = await _context.Booking_Status!.FindAsync(id);
         return new BaseDataResponse<Booking_StatusModel>(
-            statusCode: 200,
+            statusCode: bs != null ? 200 : 404,
             message: bs != null ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
             data: bs != null ? _mapper.Map<Booking_StatusModel>(bs) : null
         );
@@ -51,7 +51,7 @@ public class Booking_StatusRepository : IBooking_StatusRepository
             {
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.UNSUCCESSFUL
+                    message: Constants.ALREADY_EXSIST
                 );
             }
 
@@ -75,26 +75,34 @@ public class Booking_StatusRepository : IBooking_StatusRepository
 
     public async Task<BaseDataResponse<object>> UpdateBooking_Status(int id, Booking_StatusModel booking_status)
     {
-        var updateBS = await _context.Booking_Status!.FindAsync(id);
-        if (updateBS != null)
+        var updateBs = await _context.Booking_Status!.FindAsync(id);
+        if (updateBs != null)
         {
-            var existBS = await _context.Booking_Status.FirstOrDefaultAsync(bs =>
-                bs.booking_status_name == booking_status.booking_status_name && bs.booking_status_id != id);
-            if (existBS != null)
+            if (id == booking_status.booking_status_id)
             {
+                var existBS = await _context.Booking_Status.FirstOrDefaultAsync(bs =>
+                    bs.booking_status_name == booking_status.booking_status_name && bs.booking_status_id != id);
+                if (existBS != null)
+                {
+                    return new BaseDataResponse<object>(
+                        statusCode: 200,
+                        message: Constants.ALREADY_EXSIST
+                    );
+                }
+
+                updateBs.booking_status_name = booking_status.booking_status_name;
+                _context.Booking_Status!.Update(updateBs);
+                await _context.SaveChangesAsync();
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.ALREADY_EXSIST
+                    message: Constants.SUCCESSFUL,
+                    data: updateBs
                 );
             }
 
-            updateBS.booking_status_name = booking_status.booking_status_name;
-            _context.Booking_Status!.Update(updateBS);
-            await _context.SaveChangesAsync();
             return new BaseDataResponse<object>(
                 statusCode: 200,
-                message: Constants.SUCCESSFUL,
-                data: updateBS
+                message: Constants.NOT_MATCH
             );
         }
 
@@ -119,8 +127,8 @@ public class Booking_StatusRepository : IBooking_StatusRepository
         }
 
         return new BaseDataResponse<object>(
-            statusCode: 200,
-            message: Constants.UNSUCCESSFUL
+            statusCode: 404,
+            message: Constants.NOT_FOUND
         );
     }
 }

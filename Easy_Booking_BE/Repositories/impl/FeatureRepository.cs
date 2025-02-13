@@ -18,16 +18,15 @@ public class FeatureRepository : IFeatureRepository
         _context = context;
         _mapper = mapper;
     }
-
-
+    
     public async Task<BaseDataResponse<List<FeatureModel>>> GetAllFeaturesAsync()
     {
         var f = await _context.Features!.ToListAsync();
         var mappedData = _mapper.Map<List<FeatureModel>>(f);
         return new BaseDataResponse<List<FeatureModel>>(
-            statusCode: 200,
-            message: Constants.SUCCESSFUL,
-            data: mappedData != null && mappedData.Any() ? mappedData : new List<FeatureModel>()
+            statusCode:  mappedData.Any() ? 200 : 404,
+            message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
+            data: mappedData.Any() ? mappedData : new List<FeatureModel>()
         );
     }
 
@@ -35,7 +34,7 @@ public class FeatureRepository : IFeatureRepository
     {
         var f = await _context.Features!.FindAsync(id);
         return new BaseDataResponse<FeatureModel>(
-            statusCode: 200,
+            statusCode: f != null ? 200 : 404,
             message: f != null ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
             data: f != null ? _mapper.Map<FeatureModel>(f) : null
         );
@@ -51,7 +50,7 @@ public class FeatureRepository : IFeatureRepository
             {
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.UNSUCCESSFUL
+                    message: Constants.ALREADY_EXSIST
                 );
             }
 
@@ -78,22 +77,31 @@ public class FeatureRepository : IFeatureRepository
         var updateF = await _context.Features!.FindAsync(id);
         if (updateF != null)
         {
-            var existF = await _context.Features!.FirstOrDefaultAsync(f =>
-                f.feature_name == feature.feature_name && f.feature_id != id);
-            if (existF != null)
+            if (id == feature.feature_id)
             {
+                var existF = await _context.Features!.FirstOrDefaultAsync(f =>
+                    f.feature_name == feature.feature_name && f.feature_id != id);
+                if (existF != null)
+                {
+                    return new BaseDataResponse<object>(
+                        statusCode: 200,
+                        message: Constants.ALREADY_EXSIST
+                    );
+                }
+
+                updateF.feature_name = feature.feature_name;
+                _context.Features.Update(updateF);
+                await _context.SaveChangesAsync();
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.UNSUCCESSFUL
+                    message: Constants.SUCCESSFUL,
+                    data: updateF
                 );
             }
 
-            updateF.feature_name = feature.feature_name;
-            _context.Features!.Update(updateF);
-            await _context.SaveChangesAsync();
             return new BaseDataResponse<object>(
                 statusCode: 200,
-                message: Constants.SUCCESSFUL
+                message: Constants.NOT_MATCH
             );
         }
 
@@ -118,8 +126,8 @@ public class FeatureRepository : IFeatureRepository
         }
 
         return new BaseDataResponse<object>(
-            statusCode: 200,
-            message: Constants.UNSUCCESSFUL
+            statusCode: 404,
+            message: Constants.NOT_FOUND
         );
     }
 }

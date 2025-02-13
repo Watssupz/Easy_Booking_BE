@@ -26,7 +26,7 @@ public class LocationRepository : ILocationRepository
         return new BaseDataResponse<List<LocationModel>>(
             statusCode: mappedData.Any() ? 200 : 404,
             message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
-            data: mappedData.Any() && mappedData.Any() ? mappedData : new List<LocationModel>()
+            data: mappedData.Any() ? mappedData : new List<LocationModel>()
         );
     }
 
@@ -50,7 +50,7 @@ public class LocationRepository : ILocationRepository
             {
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.UNSUCCESSFUL
+                    message: Constants.ALREADY_EXSIST
                 );
             }
 
@@ -90,7 +90,7 @@ public class LocationRepository : ILocationRepository
                 }
 
                 updateL.location_name = location.location_name;
-                _context.Locations!.Update(updateL);
+                _context.Locations.Update(updateL);
                 await _context.SaveChangesAsync();
                 return new BaseDataResponse<object>(
                     statusCode: 200,

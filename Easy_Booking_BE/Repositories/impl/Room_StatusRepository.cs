@@ -23,11 +23,10 @@ public class Room_StatusRepository : IRoom_StatusRepository
     {
         var rs = await _context.Room_Status!.ToListAsync();
         var mappedData = _mapper.Map<List<Room_StatusModel>>(rs);
-        return new BaseDataResponse<List<Room_StatusModel>>
-        (
-            statusCode: 200,
-            message: Constants.SUCCESSFUL,
-            data: mappedData != null && mappedData.Any() ? mappedData : new List<Room_StatusModel>()
+        return new BaseDataResponse<List<Room_StatusModel>>(
+            statusCode: mappedData.Any() ? 200 : 404,
+            message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
+            data: mappedData.Any() ? mappedData : new List<Room_StatusModel>()
         );
     }
 
@@ -35,7 +34,7 @@ public class Room_StatusRepository : IRoom_StatusRepository
     {
         var rs = await _context.Room_Status!.FindAsync(id);
         return new BaseDataResponse<Room_StatusModel>(
-            statusCode: 200,
+            statusCode: rs != null ? 200 : 404,
             message: rs != null ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
             data: rs != null ? _mapper.Map<Room_StatusModel>(rs) : null
         );
@@ -49,19 +48,16 @@ public class Room_StatusRepository : IRoom_StatusRepository
                 rs.room_status_name == room_Status.room_status_name);
             if (exist != null)
             {
-                return new BaseDataResponse<object>
-                (
+                return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.ALREADY_EXSIST,
-                    data: exist
+                    message: Constants.ALREADY_EXSIST
                 );
             }
 
             var newRS = _mapper.Map<Room_Status>(room_Status);
-            _context.Room_Status!.Add(newRS);
+            await _context.Room_Status.AddAsync(newRS);
             await _context.SaveChangesAsync();
-            return new BaseDataResponse<object>
-            (
+            return new BaseDataResponse<object>(
                 statusCode: 200,
                 message: Constants.SUCCESSFUL,
                 data: newRS
@@ -81,28 +77,35 @@ public class Room_StatusRepository : IRoom_StatusRepository
         var updateRS = await _context.Room_Status!.FindAsync(id);
         if (updateRS != null)
         {
-            var existRS = await _context.Room_Status.FirstOrDefaultAsync(rs =>
-                rs.room_status_name == room_Status.room_status_name && rs.room_status_id != id);
-            if (existRS != null)
+            if (id == room_Status.room_status_id)
             {
+                var existRS = await _context.Room_Status.FirstOrDefaultAsync(rs =>
+                    rs.room_status_name == room_Status.room_status_name && rs.room_status_id != id);
+                if (existRS != null)
+                {
+                    return new BaseDataResponse<object>(
+                        statusCode: 200,
+                        message: Constants.ALREADY_EXSIST
+                    );
+                }
+
+                updateRS.room_status_name = room_Status.room_status_name;
+                _context.Room_Status!.Update(updateRS);
+                await _context.SaveChangesAsync();
                 return new BaseDataResponse<object>(
                     statusCode: 200,
-                    message: Constants.ALREADY_EXSIST
+                    message: Constants.SUCCESSFUL,
+                    data: updateRS
                 );
             }
 
-            updateRS.room_status_name = room_Status.room_status_name;
-            _context.Room_Status!.Update(updateRS);
-            await _context.SaveChangesAsync();
             return new BaseDataResponse<object>(
                 statusCode: 200,
-                message: Constants.SUCCESSFUL,
-                data: updateRS
+                message: Constants.NOT_MATCH
             );
         }
 
-        return new BaseDataResponse<object>
-        (
+        return new BaseDataResponse<object>(
             statusCode: 404,
             message: Constants.NOT_FOUND
         );
@@ -125,7 +128,7 @@ public class Room_StatusRepository : IRoom_StatusRepository
         return new BaseDataResponse<object>
         (
             statusCode: 200,
-            message: Constants.UNSUCCESSFUL
+            message: Constants.NOT_FOUND
         );
     }
 }
