@@ -10,5 +10,6 @@ public interface ILocationRepository
     public Task<BaseDataResponse<object>> CreateLocationAsync(LocationModel location);
     public Task<BaseDataResponse<object>> UpdateLocationAsync(int id, LocationModel location);
     public Task<BaseDataResponse<object>> DeleteLocationAsync(int id);
+    public Task<BaseDataResponse<List<LocationModel>>> SearchLocationAsync(LocationModel location);
     
 }

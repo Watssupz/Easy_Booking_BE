@@ -60,5 +60,12 @@ namespace Easy_Booking_BE.Controllers
             var result = await _locationRepository.DeleteLocationAsync(id);
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
+
+        [HttpPost("Search")]
+        public async Task<IActionResult> SearchLocation(LocationModel model)
+        {
+            var result = await _locationRepository.SearchLocationAsync(model);
+            return result.StatusCode == 200 ? Ok(result) : NotFound(result);
+        }
     }
 }

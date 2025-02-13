@@ -44,6 +44,13 @@ public class LocationRepository : ILocationRepository
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(location.location_name))
+            {
+                return new BaseDataResponse<object>(
+                    statusCode: 400,
+                    message: Constants.NOT_NULL
+                );
+            }
             var exist = await _context.Locations!.FirstOrDefaultAsync(l =>
                 l.location_name == location.location_name);
             if (exist != null)
@@ -77,7 +84,7 @@ public class LocationRepository : ILocationRepository
         var updateL = await _context.Locations!.FindAsync(id);
         if (updateL != null)
         {
-            if (id == location.location_id)
+            if (id == location.location_id && !string.IsNullOrWhiteSpace(location.location_name))
             {
                 var existL = await _context.Locations.FirstOrDefaultAsync(l =>
                     l.location_name == location.location_name && l.location_id != location.location_id);
@@ -100,8 +107,8 @@ public class LocationRepository : ILocationRepository
             }
 
             return new BaseDataResponse<object>(
-                statusCode: 200,
-                message: Constants.NOT_MATCH
+                statusCode: 404,
+                message: Constants.ERROR
             );
         }
 
@@ -126,6 +133,25 @@ public class LocationRepository : ILocationRepository
         }
 
         return new BaseDataResponse<object>(
+            statusCode: 404,
+            message: Constants.NOT_FOUND
+        );
+    }
+
+    public async Task<BaseDataResponse<List<LocationModel>>> SearchLocationAsync(LocationModel model)
+    {
+        var searchL = await _context.Locations.Where(l => l.location_name.Contains(model.location_name)).ToListAsync();
+        var mappedData = _mapper.Map<List<LocationModel>>(searchL);
+        if (searchL.Any())
+        {
+            return new BaseDataResponse<List<LocationModel>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: mappedData
+            );
+        }
+
+        return new BaseDataResponse<List<LocationModel>>(
             statusCode: 404,
             message: Constants.NOT_FOUND
         );
