@@ -10,4 +10,5 @@ public class Constants
     public const string UPDATE_ERROR = "Update Error";
     public const string UPDATE_SUCCESS = "Update Successful";
     public const string NOT_MATCH = "Not match";
+    public const string NOT_NULL = "Not null";
 }

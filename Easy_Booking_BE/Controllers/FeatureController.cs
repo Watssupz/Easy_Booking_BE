@@ -61,5 +61,13 @@ namespace Easy_Booking_BE.Controllers
             var result = await _featureRepository.DeleteFeatureAsync(id);
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
+
+        [HttpPost("Search")]
+        public async Task<IActionResult> SearchFeature(FeatureModel model)
+        {
+            var result = await _featureRepository.SearchFeatureAsync(model);
+            return result.StatusCode == 200 ? Ok(result) : NotFound(result);
+        }
+        
     }
 }

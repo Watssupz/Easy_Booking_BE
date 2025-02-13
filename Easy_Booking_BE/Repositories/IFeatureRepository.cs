@@ -11,5 +11,6 @@ public interface IFeatureRepository
     public Task<BaseDataResponse<object>> CreateFeatureAsync(FeatureModel feature);
     public Task<BaseDataResponse<object>> UpdateFeatureAsync(int id, FeatureModel feature);
     public Task<BaseDataResponse<object>> DeleteFeatureAsync(int id);
+    public Task<BaseDataResponse<List<FeatureModel>>> SearchFeatureAsync(FeatureModel feature);
     
 }

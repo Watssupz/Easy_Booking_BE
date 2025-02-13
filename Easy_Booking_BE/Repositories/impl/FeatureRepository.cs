@@ -18,13 +18,13 @@ public class FeatureRepository : IFeatureRepository
         _context = context;
         _mapper = mapper;
     }
-    
+
     public async Task<BaseDataResponse<List<FeatureModel>>> GetAllFeaturesAsync()
     {
         var f = await _context.Features!.ToListAsync();
         var mappedData = _mapper.Map<List<FeatureModel>>(f);
         return new BaseDataResponse<List<FeatureModel>>(
-            statusCode:  mappedData.Any() ? 200 : 404,
+            statusCode: mappedData.Any() ? 200 : 404,
             message: mappedData.Any() ? Constants.SUCCESSFUL : Constants.NOT_FOUND,
             data: mappedData.Any() ? mappedData : new List<FeatureModel>()
         );
@@ -44,6 +44,13 @@ public class FeatureRepository : IFeatureRepository
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(feature.feature_name))
+            {
+                return new BaseDataResponse<object>(
+                    statusCode: 400,
+                    message: Constants.NOT_NULL
+                );
+            }
             var exist = await _context.Features!.FirstOrDefaultAsync(f =>
                 f.feature_name == feature.feature_name);
             if (exist != null)
@@ -77,7 +84,7 @@ public class FeatureRepository : IFeatureRepository
         var updateF = await _context.Features!.FindAsync(id);
         if (updateF != null)
         {
-            if (id == feature.feature_id)
+            if (id == feature.feature_id && !string.IsNullOrWhiteSpace(feature.feature_name))
             {
                 var existF = await _context.Features!.FirstOrDefaultAsync(f =>
                     f.feature_name == feature.feature_name && f.feature_id != id);
@@ -100,8 +107,8 @@ public class FeatureRepository : IFeatureRepository
             }
 
             return new BaseDataResponse<object>(
-                statusCode: 200,
-                message: Constants.NOT_MATCH
+                statusCode: 404,
+                message: Constants.ERROR
             );
         }
 
@@ -126,6 +133,25 @@ public class FeatureRepository : IFeatureRepository
         }
 
         return new BaseDataResponse<object>(
+            statusCode: 404,
+            message: Constants.NOT_FOUND
+        );
+    }
+
+    public async Task<BaseDataResponse<List<FeatureModel>>> SearchFeatureAsync(FeatureModel feature)
+    {
+        var searchF = await _context.Features!.Where(f => f.feature_name.Contains(feature.feature_name)).ToListAsync();
+        var mappedData = _mapper.Map<List<FeatureModel>>(searchF);
+        if (searchF.Any())
+        {
+            return new BaseDataResponse<List<FeatureModel>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: mappedData
+            );
+        }
+
+        return new BaseDataResponse<List<FeatureModel>>(
             statusCode: 404,
             message: Constants.NOT_FOUND
         );
