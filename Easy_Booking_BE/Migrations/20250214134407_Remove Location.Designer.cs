@@ -4,6 +4,7 @@ using Easy_Booking_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Easy_Booking_BE.Migrations
 {
     [DbContext(typeof(EasyBookingBEContext))]
-    partial class EasyBookingBEContextModelSnapshot : ModelSnapshot
+    [Migration("20250214134407_Remove Location")]
+    partial class RemoveLocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,10 +250,6 @@ namespace Easy_Booking_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("room_id"), 1L, 1);
 
                     b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

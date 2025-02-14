@@ -17,12 +17,12 @@ public class Room
     // public int floor_id { get; set; }
     [ForeignKey("Room_Status")]
     public int room_status_id { get; set; }
-    [ForeignKey("Location")]
-    public int location_id { get; set; }
-    
+    // [ForeignKey("Location")]
+     public string location { get; set; }
+
     // public virtual Floor Floor { get; set; }
     public virtual Room_Status Room_Status { get; set; }
-    public virtual Location Location { get; set; }
+    // public virtual Location Location { get; set; }
     
 }
 
