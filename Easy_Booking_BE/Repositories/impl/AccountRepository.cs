@@ -15,25 +15,27 @@ namespace Easy_Booking_BE.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         public async Task<BaseDataResponse<string>> SignInAsync(SignInModel signInModel)
         {
-            var result = await _signInManager.PasswordSignInAsync(signInModel.email, signInModel.password, false, false);
-            if(!result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(signInModel.email);
+            var passwordValid = await _userManager.CheckPasswordAsync(user, signInModel.password);
+            if (user == null || !passwordValid)
             {
                 return new BaseDataResponse<string>
-                    (
-                        statusCode: 400, 
-                        message: Constants.ERROR, 
-                        data: null
-                    );
+                (
+                    statusCode: 400, 
+                    message: Constants.ERROR
+                );
             }
             var authenticationClaims = new List<Claim>
             {
@@ -41,6 +43,11 @@ namespace Easy_Booking_BE.Repositories
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            var userRole = await _userManager.GetRolesAsync(user);
+            foreach (var role in userRole)
+            {
+                authenticationClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
             var authenticationKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 
             var token = new JwtSecurityToken(
@@ -71,6 +78,16 @@ namespace Easy_Booking_BE.Repositories
                 UserName = signUpModel.email,
             };
             var result = await _userManager.CreateAsync(user, signUpModel.password);
+
+            if (result.Succeeded)
+            {
+                if (!await _roleManager.RoleExistsAsync(Constants.CUSTOMER))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(Constants.CUSTOMER));
+                }
+                await _userManager.AddToRoleAsync(user, Constants.CUSTOMER);
+            }
+            
             return new BaseDataResponse<IdentityResult>
             (
                 statusCode: result.Succeeded ? 200 : 400,
