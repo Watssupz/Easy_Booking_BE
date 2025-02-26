@@ -151,5 +151,66 @@ namespace Easy_Booking_BE.Repositories
                 message: Constants.UPDATE_SUCCESS
             );
         }
+
+        public async Task<BaseDataResponse<string>> UpdatePassword(PasswordModel model)
+        {
+            var token = await _util.GetTokenAsync();
+            //decode token
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            // get userid from token
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new BaseDataResponse<string>
+                (
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            // Kiểm tra xem model có chứa thông tin mật khẩu không
+            if (model == null || string.IsNullOrEmpty(model.current_password) || string.IsNullOrEmpty(model.new_password))
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: "Current password and new password are required."
+                );
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 404,
+                    message: "User " + Constants.NOT_FOUND
+                );
+            }
+
+            // Xác minh mật khẩu cũ (nếu cần)
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.current_password);
+            if (!isPasswordValid)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: "Current password is incorrect."
+                );
+            }
+
+            // Cập nhật mật khẩu mới
+            var result = await _userManager.ChangePasswordAsync(user, model.current_password, model.new_password);
+            if (!result.Succeeded)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: Constants.UPDATE_ERROR
+                );
+            }
+
+            return new BaseDataResponse<string>(
+                statusCode: 200,
+                message: Constants.UPDATE_SUCCESS
+            );
+        }
     }
 }

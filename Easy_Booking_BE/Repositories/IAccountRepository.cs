@@ -9,5 +9,6 @@ namespace Easy_Booking_BE.Repositories
         public Task<BaseDataResponse<IdentityResult>> SignUpAsync(SignUpModel model);
         public Task<BaseDataResponse<string>> SignInAsync(SignInModel model);
         public Task<BaseDataResponse<string>> UpdateProfile(UserModel model);
+        public Task<BaseDataResponse<string>> UpdatePassword(PasswordModel model);
     }
 }
