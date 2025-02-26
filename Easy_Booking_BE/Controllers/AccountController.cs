@@ -2,6 +2,7 @@
 using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,14 @@ namespace Easy_Booking_BE.Controllers
                 return BadRequest(response);
             }
             return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPost("UpdateProf")]
+        public async Task<IActionResult> UpdateProfile(UserModel model)
+        {
+            var response = await _accountRepo.UpdateProfile(model);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
     }
 }
