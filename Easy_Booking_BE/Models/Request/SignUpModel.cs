@@ -14,5 +14,7 @@ namespace Easy_Booking_BE.Models
         public string password { get; set; }
         [Required]
         public string confirm_password { get; set; }
+        [RegularExpression(@"^0\d{9}$")]
+        public string phone_number { get; set; }
     }
 }

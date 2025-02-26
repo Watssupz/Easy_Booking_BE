@@ -76,6 +76,7 @@ namespace Easy_Booking_BE.Repositories
                 last_name = signUpModel.last_name,
                 Email = signUpModel.email,
                 UserName = signUpModel.email,
+                PhoneNumber = signUpModel.phone_number
             };
             var result = await _userManager.CreateAsync(user, signUpModel.password);
 
