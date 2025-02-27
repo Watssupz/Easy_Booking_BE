@@ -112,8 +112,6 @@ namespace Easy_Booking_BE.Repositories
             // get userid from token
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            Console.WriteLine("Userriddddddddd: " + userId);
-
             if (string.IsNullOrEmpty(userId))
             {
                 return new BaseDataResponse<string>
@@ -132,10 +130,34 @@ namespace Easy_Booking_BE.Repositories
                 );
             }
 
-            user.first_name = model.first_name;
-            user.last_name = model.last_name;
-            user.PhoneNumber = model.phone_number;
-            user.Email = model.email;
+            if (!string.IsNullOrEmpty(model.first_name))
+            {
+                user.first_name = model.first_name;
+            }
+
+            if (!string.IsNullOrEmpty(model.last_name))
+            {
+                user.last_name = model.last_name;
+            }
+
+            if (!string.IsNullOrEmpty(model.phone_number))
+            {
+                user.PhoneNumber = model.phone_number;
+            }
+
+            if (!string.IsNullOrEmpty(model.email))
+            {
+                user.Email = model.email;
+            }
+
+            if (string.IsNullOrEmpty((model.first_name)) && (string.IsNullOrEmpty(model.last_name)) &&
+                (string.IsNullOrEmpty(model.phone_number)) && (string.IsNullOrEmpty(model.email)))
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: Constants.NO_FIELDS_FOR_UPDATE
+                );
+            }
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -170,7 +192,8 @@ namespace Easy_Booking_BE.Repositories
             }
 
             // Kiểm tra xem model có chứa thông tin mật khẩu không
-            if (model == null || string.IsNullOrEmpty(model.current_password) || string.IsNullOrEmpty(model.new_password))
+            if (model == null || string.IsNullOrEmpty(model.current_password) ||
+                string.IsNullOrEmpty(model.new_password))
             {
                 return new BaseDataResponse<string>(
                     statusCode: 400,
@@ -210,6 +233,46 @@ namespace Easy_Booking_BE.Repositories
             return new BaseDataResponse<string>(
                 statusCode: 200,
                 message: Constants.UPDATE_SUCCESS
+            );
+        }
+
+        public async Task<BaseDataResponse<UserModel>> GetUser()
+        {
+            var token = await _util.GetTokenAsync();
+            //decode token
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            // get userid from token
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new BaseDataResponse<UserModel>
+                (
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new BaseDataResponse<UserModel>(
+                    statusCode: 404,
+                    message: "User " + Constants.NOT_FOUND
+                );
+            }
+
+            var userModel = new UserModel
+            {
+                first_name = user.first_name,
+                last_name = user.last_name,
+                email = user.Email,
+                phone_number = user.PhoneNumber,
+            };
+            return new BaseDataResponse<UserModel>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: userModel
             );
         }
     }

@@ -63,5 +63,13 @@ namespace Easy_Booking_BE.Controllers
             var response = await _accountRepo.UpdatePassword(model);
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var response = await _accountRepo.GetUser();
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
     }
 }

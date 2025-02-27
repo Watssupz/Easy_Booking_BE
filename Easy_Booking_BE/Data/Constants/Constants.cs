@@ -12,6 +12,7 @@ public static class Constants
     public const string NOT_MATCH = "Not match";
     public const string NOT_NULL = "Not null";
     public const string NO_CHANGES = "No changes";
+    public const string NO_FIELDS_FOR_UPDATE = "No fields for update";
     
     public const string ADMIN = "Administrator";
     public const string CUSTOMER = "Customer";
