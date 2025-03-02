@@ -22,7 +22,7 @@ namespace Easy_Booking_BE.Controllers
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(SignUpModel model)
         {
-            if(model.password != model.confirm_password)
+            if (model.password != model.confirm_password)
             {
                 return BadRequest(
                     new BaseDataResponse<object>
@@ -45,6 +45,7 @@ namespace Easy_Booking_BE.Controllers
             {
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
 
@@ -65,10 +66,18 @@ namespace Easy_Booking_BE.Controllers
         }
 
         [Authorize]
-        [HttpGet("profile")]
+        [HttpGet("Profile")]
         public async Task<IActionResult> GetProfile()
         {
             var response = await _accountRepo.GetUser();
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
+
+        [Authorize]
+        [HttpPost("CreateHost")]
+        public async Task<IActionResult> CreateHost(UserModel model)
+        {
+            var response = await _accountRepo.CreateHostByEmail(model);
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
     }

@@ -11,5 +11,7 @@ namespace Easy_Booking_BE.Repositories
         public Task<BaseDataResponse<string>> UpdateProfile(UserModel model);
         public Task<BaseDataResponse<string>> UpdatePassword(PasswordModel model);
         public Task<BaseDataResponse<UserModel>> GetUser();
+        public Task<BaseDataResponse<List<string>>> GetUserRole();
+        public Task<BaseDataResponse<string>> CreateHostByEmail(UserModel model);
     }
 }

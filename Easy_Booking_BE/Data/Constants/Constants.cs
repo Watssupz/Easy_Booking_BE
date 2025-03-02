@@ -6,6 +6,7 @@ public static class Constants
     public const string UNSUCCESSFUL = "unsuccessful";
     public const string ERROR = "Error";
     public const string NOT_FOUND = "Not found";
+    public const string FOUND = "Found";
     public const string ALREADY_EXSIST = "Already exists";
     public const string UPDATE_ERROR = "Update Error";
     public const string UPDATE_SUCCESS = "Update Successful";

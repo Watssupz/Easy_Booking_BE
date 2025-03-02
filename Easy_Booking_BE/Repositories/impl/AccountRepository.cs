@@ -275,5 +275,60 @@ namespace Easy_Booking_BE.Repositories
                 data: userModel
             );
         }
+
+        public async Task<BaseDataResponse<string>> CreateHostByEmail(UserModel model)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(model.email))
+                {
+                    return new BaseDataResponse<string>(
+                        statusCode: 404,
+                        message: "Email is required"
+                    );
+                }
+
+                var user = await _userManager.FindByEmailAsync(model.email);
+                if (user == null)
+                {
+                    return new BaseDataResponse<string>(
+                        statusCode: 404,
+                        message: Constants.NOT_FOUND
+                    );
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains(Constants.HOST))
+                {
+                    return new BaseDataResponse<string>(
+                        statusCode: 400,
+                        message: Constants.ALREADY_EXSIST
+                    );
+                }
+
+                var result = await _userManager.AddToRoleAsync(user, Constants.HOST);
+                if (!result.Succeeded)
+                {
+                    return new BaseDataResponse<string>
+                    (
+                        statusCode: 400,
+                        message: Constants.ERROR
+                    );
+                }
+
+                return new BaseDataResponse<string>(
+                    statusCode: 200,
+                    message: Constants.SUCCESSFUL
+                );
+            }
+            catch (Exception e)
+            {
+                return new BaseDataResponse<string>
+                (
+                    statusCode: 500,
+                    message: Constants.ERROR
+                );
+            }
+        }
     }
 }
