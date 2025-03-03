@@ -261,6 +261,11 @@ namespace Easy_Booking_BE.Repositories
                     message: "User " + Constants.NOT_FOUND
                 );
             }
+            
+            var roles = jwtToken.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToList();
 
             var userModel = new UserModel
             {
@@ -268,6 +273,7 @@ namespace Easy_Booking_BE.Repositories
                 last_name = user.last_name,
                 email = user.Email,
                 phone_number = user.PhoneNumber,
+                roles = roles
             };
             return new BaseDataResponse<UserModel>(
                 statusCode: 200,
