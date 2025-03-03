@@ -20,4 +20,17 @@ public class Util
         }
         return token;
     }
+    
+    public string GetBase64WithoutPrefix(string base64String)
+    {
+        if (string.IsNullOrEmpty(base64String))
+        {
+            return null;
+        }
+        if (base64String.Contains(";base64,"))
+        {
+            return base64String.Split(',')[1];
+        }
+        return base64String;
+    }
 }

@@ -7,4 +7,5 @@ public class UserModel
     public string? email { get; set; }
     public string? phone_number { get; set; }
     public List<string>? roles { get; set; }
+    public string? avatar { get; set; }
 }

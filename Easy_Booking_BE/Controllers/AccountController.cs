@@ -80,5 +80,13 @@ namespace Easy_Booking_BE.Controllers
             var response = await _accountRepo.CreateHostByEmail(model);
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
+
+        [Authorize]
+        [HttpPost("Upload")]
+        public async Task<IActionResult> Upload([FromForm] UploadModel model)
+        {
+            var response = await _accountRepo.UploadAvatar(model);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
     }
 }

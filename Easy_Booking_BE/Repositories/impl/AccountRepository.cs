@@ -267,13 +267,18 @@ namespace Easy_Booking_BE.Repositories
                 .Select(c => c.Value)
                 .ToList();
 
+            string base64Image = user.avatar != null 
+                ? $"data:image/png;base64,{Convert.ToBase64String(user.avatar)}" 
+                : null;
+            
             var userModel = new UserModel
             {
                 first_name = user.first_name,
                 last_name = user.last_name,
                 email = user.Email,
                 phone_number = user.PhoneNumber,
-                roles = roles
+                roles = roles,
+                avatar = base64Image
             };
             return new BaseDataResponse<UserModel>(
                 statusCode: 200,
@@ -333,6 +338,63 @@ namespace Easy_Booking_BE.Repositories
                 (
                     statusCode: 500,
                     message: Constants.ERROR
+                );
+            }
+        }
+
+        public async Task<BaseDataResponse<string>> UploadAvatar(UploadModel model)
+        {
+            if (model.ImageFile == null || model.ImageFile.Length == 0)
+            {
+                return new BaseDataResponse<string>(400, "Base64 image is required");
+            }
+            try
+            {
+                var token = await _util.GetTokenAsync();
+                //decode token
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                // get userid from token
+                var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return new BaseDataResponse<string>(
+                        statusCode: 404,
+                        message: "User " + Constants.NOT_FOUND
+                    );
+                }
+
+                // Chuyển tệp thành byte[]
+                using var memoryStream = new MemoryStream();
+                await model.ImageFile.CopyToAsync(memoryStream);
+                user.avatar = memoryStream.ToArray();
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return new BaseDataResponse<string>(
+                        statusCode: 400,
+                        message: Constants.UPDATE_ERROR
+                    );
+                }
+                return new BaseDataResponse<string>(
+                    statusCode: 200,
+                    message: Constants.SUCCESSFUL
+                );
+            }
+            catch (FormatException f)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: "Invalid base64 string"
+                );
+            }
+            catch (Exception e)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode:500, 
+                    message: e.Message
                 );
             }
         }
