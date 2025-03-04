@@ -22,7 +22,7 @@ namespace Easy_Booking_BE.Data
         public DbSet<Room>? Room { get; set; }
         public DbSet<Room_Feature>? Room_Features { get; set; }
         public DbSet<Room_Status>? Room_Status { get; set; }
-
+        public DbSet<Media>? Medias { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
