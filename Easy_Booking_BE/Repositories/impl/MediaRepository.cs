@@ -19,6 +19,24 @@ public class MediaRepository : IMediaRepository
     }
 
 
+    public async Task<BaseDataResponse<List<MediaModel>>> GetMediaByRoomId(int roomId)
+    {
+        var listMedia = await _context.Medias.Where(r => r.room_id == roomId).ToListAsync();
+        if (!listMedia.Any())
+        {
+            return new BaseDataResponse<List<MediaModel>>(
+                statusCode: 404,
+                message: Constants.NOT_FOUND
+            );
+        }
+        var mediaModels = _mapper.Map<List<MediaModel>>(listMedia);
+        return new BaseDataResponse<List<MediaModel>>(
+            statusCode: 200,
+            message: Constants.SUCCESSFUL,
+            data: mediaModels
+        );
+    }
+
     public async Task<BaseDataResponse<string>> CreateMediaByRoomId(int room_id, IFormFileCollection uploadModels)
     {
         try

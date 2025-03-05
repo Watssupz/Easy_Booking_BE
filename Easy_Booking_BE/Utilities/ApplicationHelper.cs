@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Easy_Booking_BE.Data;
 using Easy_Booking_BE.Models;
 using EasyBooking.Data;
 using Feature = EasyBooking.Data.Feature;
@@ -17,6 +18,7 @@ public class ApplicationHelper : Profile
         CreateMap<Feature, FeatureModel>().ReverseMap();
         CreateMap<Location, LocationModel>().ReverseMap();
         CreateMap<Room, RoomModel>().ReverseMap();
+        CreateMap<Media, MediaModel>().ReverseMap();
     }
     
 }
