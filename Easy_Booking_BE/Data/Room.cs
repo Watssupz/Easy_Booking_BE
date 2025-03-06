@@ -9,6 +9,7 @@ public class Room
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int room_id { get; set; }
+    public String user_id { get; set; }
     public string room_number { get; set; }
     public double price_per_night { get; set; }
     public string description { get; set; }

@@ -9,6 +9,7 @@ public class Booking
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int booking_id { get; set; }
+    public String user_id { get; set; }
     public DateTime start_date_booking { get; set; }
     public DateTime end_date_booking { get; set; }
     public DateTime check_in  { get; set; }
