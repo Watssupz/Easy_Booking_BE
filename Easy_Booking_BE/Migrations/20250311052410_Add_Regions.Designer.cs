@@ -4,6 +4,7 @@ using Easy_Booking_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Easy_Booking_BE.Migrations
 {
     [DbContext(typeof(EasyBookingBEContext))]
-    partial class EasyBookingBEContextModelSnapshot : ModelSnapshot
+    [Migration("20250311052410_Add_Regions")]
+    partial class Add_Regions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,16 +123,18 @@ namespace Easy_Booking_BE.Migrations
 
             modelBuilder.Entity("Easy_Booking_BE.Data.Region", b =>
                 {
-                    b.Property<int?>("district_id")
+                    b.Property<int>("district_id")
                         .HasColumnType("int");
 
                     b.Property<string>("district_name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("province_id")
+                    b.Property<int>("province_id")
                         .HasColumnType("int");
 
                     b.Property<string>("province_name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("region_id")
@@ -139,10 +143,11 @@ namespace Easy_Booking_BE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("region_id"), 1L, 1);
 
-                    b.Property<int?>("ward_id")
+                    b.Property<int>("ward_id")
                         .HasColumnType("int");
 
                     b.Property<string>("ward_name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Region");
@@ -395,28 +400,28 @@ namespace Easy_Booking_BE.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "11ea75d4-c970-4390-8be5-41d9c9170405",
+                            ConcurrencyStamp = "ece5e329-6feb-4bd3-8d79-f669dfd020ac",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "972e2a1f-c3d6-456f-9f86-bb4dfbbc98e0",
+                            ConcurrencyStamp = "0345d4fd-28c6-4366-b738-4bcacb2bf7aa",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = "3",
-                            ConcurrencyStamp = "2c81ac98-d728-4f78-8731-740526dc0f87",
+                            ConcurrencyStamp = "f533966b-98e0-4d38-8cfc-ff18d1551df7",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
                             Id = "4",
-                            ConcurrencyStamp = "8368ecea-56cd-4917-83e0-5e12c5dd0cc7",
+                            ConcurrencyStamp = "d6c1ec88-a560-439a-aa03-d71dcc498168",
                             Name = "Support Staff",
                             NormalizedName = "SUPPORT STAFF"
                         });

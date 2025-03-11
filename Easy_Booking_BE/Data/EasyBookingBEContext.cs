@@ -23,6 +23,7 @@ namespace Easy_Booking_BE.Data
         public DbSet<Room_Feature>? Room_Features { get; set; }
         public DbSet<Room_Status>? Room_Status { get; set; }
         public DbSet<Media>? Medias { get; set; }
+        public DbSet<Region>? Regions { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,6 +67,7 @@ namespace Easy_Booking_BE.Data
 
             modelBuilder.Entity<Room_Feature>()
                 .HasKey(rf => new {rf.room_id ,rf.feature_id });
+            modelBuilder.Entity<Region>().HasNoKey();
         }
     }
 }
