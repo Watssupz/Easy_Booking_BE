@@ -6,6 +6,7 @@ using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Models.Response;
 using Easy_Booking_BE.Repositories;
 using EasyBooking.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,14 +37,10 @@ namespace Easy_Booking_BE.Controllers
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
 
+        [Authorize]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateRoom([FromBody] Room_FeatureIdsModel room)
         {
-            var exist = await _roomRepository.CheckDuplicateRoomAsync(room.Room);
-            if (exist.StatusCode == 400)
-            {
-                return BadRequest(exist);
-            }
             var result = await _roomRepository.CreateRoomAsync(room);
             return result.StatusCode == 200 ? Ok(result) : BadRequest(result);
         }

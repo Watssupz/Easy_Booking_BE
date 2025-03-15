@@ -3,6 +3,7 @@ using Easy_Booking_BE.Data;
 using Easy_Booking_BE.Data.Constants;
 using Easy_Booking_BE.Models;
 using Easy_Booking_BE.Models.Response;
+using Easy_Booking_BE.Utilities;
 using EasyBooking.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +13,13 @@ public class RoomRepository : IRoomRepository
 {
     private readonly EasyBookingBEContext _context;
     private readonly IMapper _mapper;
+    private readonly Util _util;
 
-    public RoomRepository(EasyBookingBEContext context, IMapper mapper)
+    public RoomRepository(EasyBookingBEContext context, IMapper mapper, Util util)
     {
         _context = context;
         _mapper = mapper;
+        _util = util;
     }
 
     public async Task<BaseDataResponse<List<Room_FeatureIdsModel>>> GetAllRoomsAsync()
@@ -90,9 +93,10 @@ public class RoomRepository : IRoomRepository
     {
         try
         {
+            var userId = await _util.GetUserIdFromTokenAsync();
             var exist = await _context.Room.FirstOrDefaultAsync(r =>
                 r.room_number == room.Room.room_number &&
-                r.location == room.Room.location);
+                r.user_id == userId);
             if (exist != null)
             {
                 return new BaseDataResponse<object>(
@@ -102,6 +106,8 @@ public class RoomRepository : IRoomRepository
             }
 
             var newRoom = _mapper.Map<Room>(room.Room);
+            newRoom.user_id = userId;
+            
             await _context.Room.AddAsync(newRoom);
             await _context.SaveChangesAsync();
 
@@ -125,7 +131,7 @@ public class RoomRepository : IRoomRepository
             return new BaseDataResponse<object>(
                 statusCode: 200,
                 message: Constants.SUCCESSFUL,
-                data: respond
+                data: respond.Room.room_id
             );
         }
         catch (Exception ex)

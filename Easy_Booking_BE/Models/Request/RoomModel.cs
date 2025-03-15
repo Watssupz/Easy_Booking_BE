@@ -14,4 +14,5 @@ public class RoomModel
     [Required] public string description { get; set; }
     [Required] public int room_status_id { get; set; }
     [Required] public string location { get; set; }
+    public String? user_id { get; set; }
 }
