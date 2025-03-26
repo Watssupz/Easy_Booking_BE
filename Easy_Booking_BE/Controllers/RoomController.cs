@@ -72,5 +72,13 @@ namespace Easy_Booking_BE.Controllers
             var result = await _roomRepository.GetRoomByStatusIdAsync(statusId);
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
+
+        [Authorize]
+        [HttpGet("GetRooms")]
+        public async Task<IActionResult> GetRooms()
+        {
+            var result = await _roomRepository.GetRoomsByUserIdAsync();
+            return result.StatusCode == 200 ? Ok(result) : NotFound(result);
+        }
     }
 }

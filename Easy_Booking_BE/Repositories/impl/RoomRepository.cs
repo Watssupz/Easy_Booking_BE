@@ -218,6 +218,36 @@ public class RoomRepository : IRoomRepository
         );
     }
 
+    public async Task<BaseDataResponse<List<RoomModel>>> GetRoomsByUserIdAsync()
+    {
+        try
+        {
+            var userId = await _util.GetUserIdFromTokenAsync();
+            if (userId == null)
+            {
+                return new BaseDataResponse<List<RoomModel>>(
+                    statusCode: 401,
+                    message: Constants.ERROR
+                );
+            }
+
+            var listRoom = await _context.Room!.Where(r => r.user_id == userId).ToListAsync();
+            var mappedData = _mapper.Map<List<RoomModel>>(listRoom);
+            return new BaseDataResponse<List<RoomModel>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: mappedData
+            );
+        }
+        catch (Exception ex)
+        {
+            return new BaseDataResponse<List<RoomModel>>(
+                statusCode: 404,
+                message: Constants.ERROR
+            );
+        }
+    }
+
     public async Task<BaseDataResponse<List<RoomModel>>> SearchRoomsByLocationAsync(RoomSearchModel model)
     {
         var searchR = await _context.Room!.Where(r => r.location.Contains(model.location)).ToListAsync();
@@ -270,7 +300,7 @@ public class RoomRepository : IRoomRepository
     public async Task<BaseDataResponse<List<Room_FeatureIdsModel>>> GetRoomByStatusIdAsync(int id)
     {
         var searchR = await _context.Room!.Where(r => r.room_status_id == id).ToListAsync();
-        
+
         if (!searchR.Any())
         {
             return new BaseDataResponse<List<Room_FeatureIdsModel>>(
@@ -279,6 +309,7 @@ public class RoomRepository : IRoomRepository
                 data: new List<Room_FeatureIdsModel>()
             );
         }
+
         // Lấy danh sách RoomId -> FeatureIds
         var roomFeatures = _context.Room_Features
             .AsEnumerable()

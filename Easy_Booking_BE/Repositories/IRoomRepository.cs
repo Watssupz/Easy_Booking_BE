@@ -14,4 +14,5 @@ public interface IRoomRepository
     public Task<BaseDataResponse<List<RoomModel>>> SearchRoomsByLocationAsync(RoomSearchModel model);
     public Task<BaseDataResponse<List<Room_FeatureIdsModel>>> GetRoomByStatusIdAsync(int id);
     public Task<BaseDataResponse<object>> CheckDuplicateRoomAsync(RoomModel model);
+    public Task<BaseDataResponse<List<RoomModel>>> GetRoomsByUserIdAsync();
 }
