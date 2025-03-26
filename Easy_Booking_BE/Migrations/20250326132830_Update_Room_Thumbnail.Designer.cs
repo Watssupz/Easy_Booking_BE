@@ -4,6 +4,7 @@ using Easy_Booking_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Easy_Booking_BE.Migrations
 {
     [DbContext(typeof(EasyBookingBEContext))]
-    partial class EasyBookingBEContextModelSnapshot : ModelSnapshot
+    [Migration("20250326132830_Update_Room_Thumbnail")]
+    partial class Update_Room_Thumbnail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

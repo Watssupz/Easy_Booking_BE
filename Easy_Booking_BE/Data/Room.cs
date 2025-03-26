@@ -13,7 +13,7 @@ public class Room
     public string room_number { get; set; }
     public double price_per_night { get; set; }
     public string description { get; set; }
-    
+    public byte[]? thumbnail  { get; set; }
     // [ForeignKey("Floor")]
     // public int floor_id { get; set; }
     [ForeignKey("Room_Status")]
