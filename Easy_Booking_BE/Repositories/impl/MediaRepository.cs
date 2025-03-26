@@ -116,4 +116,50 @@ public class MediaRepository : IMediaRepository
             );
         }
     }
+    
+    public async Task<BaseDataResponse<string>> CreateThumbnailByRoomId(int room_id, IFormFile uploadModel)
+    {
+        try
+        {
+            if (uploadModel == null || uploadModel.Length == 0)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 400,
+                    message: Constants.ERROR
+                );
+            }
+
+            // Convert file to byte array
+            byte[] thumbnailData;
+            using (var memoryStream = new MemoryStream())
+            {
+                await uploadModel.CopyToAsync(memoryStream);
+                thumbnailData = memoryStream.ToArray();
+            }
+        
+            var room = await _context.Room.FirstOrDefaultAsync(r => r.room_id == room_id);
+            if (room == null)
+            {
+                return new BaseDataResponse<string>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+            
+            room.thumbnail = thumbnailData;
+            _context.SaveChangesAsync();
+            return new BaseDataResponse<string>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL
+            );
+        }
+        catch (Exception ex)
+        {
+            return new BaseDataResponse<string>(
+                statusCode: 500,
+                message: ex.Message
+            );
+        }
+    }
+    
 }

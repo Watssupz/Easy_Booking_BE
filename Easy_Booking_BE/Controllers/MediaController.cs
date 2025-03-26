@@ -29,6 +29,13 @@ namespace Easy_Booking_BE.Controllers
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
 
+        [HttpPost("upload_thumbnail/{room_id}")]
+        public async Task<IActionResult> UploadThumbnail(int room_id, IFormFile upload)
+        {
+            var response = await _mediaRepository.CreateThumbnailByRoomId(room_id, upload);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
+        
         [HttpGet("Media/r_id={room_id}")]
         public async Task<IActionResult> GetMediaByRoomId(int room_id)
         {
