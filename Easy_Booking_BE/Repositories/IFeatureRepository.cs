@@ -8,6 +8,7 @@ public interface IFeatureRepository
 {
     public Task<BaseDataResponse<List<FeatureModel>>> GetAllFeaturesAsync();
     public Task<BaseDataResponse<FeatureModel>> GetFeatureByIdAsync(int id);
+    public Task<BaseDataResponse<List<String>>> GetFeatureByRoomId(int rid);
     public Task<BaseDataResponse<object>> CreateFeatureAsync(FeatureModel feature);
     public Task<BaseDataResponse<object>> UpdateFeatureAsync(int id, FeatureModel feature);
     public Task<BaseDataResponse<object>> DeleteFeatureAsync(int id);

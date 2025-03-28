@@ -40,6 +40,38 @@ public class FeatureRepository : IFeatureRepository
         );
     }
 
+    public async Task<BaseDataResponse<List<String>>> GetFeatureByRoomId(int rid)
+    {
+        try
+        {
+            var exist = await _context.Room.FirstOrDefaultAsync(r => r.room_id == rid);
+            if (exist == null)
+            {
+                return new BaseDataResponse<List<String>>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            var list_feature = await _context.Room_Features
+                .Include(r => r.Feature)
+                .Where(rf => rf.room_id == rid).Select(x => x.Feature.feature_name).ToListAsync();
+
+            return new BaseDataResponse<List<String>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: list_feature
+            );
+        }
+        catch (Exception ex)
+        {
+            return new BaseDataResponse<List<String>>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
+
     public async Task<BaseDataResponse<object>> CreateFeatureAsync(FeatureModel feature)
     {
         try

@@ -31,6 +31,13 @@ namespace Easy_Booking_BE.Controllers
             return result.StatusCode == 200 ? Ok(result) : NotFound(result);
         }
 
+        [HttpGet("get-by-rid/{rid}")]
+        public async Task<IActionResult> GetFeaturesByRoomId(int rid)
+        {
+            var result = await _featureRepository.GetFeatureByRoomId(rid);
+            return result.StatusCode == 200 ? Ok(result) : NotFound(result);
+        }
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeatureById(int id)
         {

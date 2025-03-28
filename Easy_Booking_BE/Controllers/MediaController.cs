@@ -36,7 +36,7 @@ namespace Easy_Booking_BE.Controllers
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
         
-        [HttpGet("Media/r_id={room_id}")]
+        [HttpGet("{room_id}")]
         public async Task<IActionResult> GetMediaByRoomId(int room_id)
         {
             var response = await _mediaRepository.GetMediaByRoomId(room_id);
