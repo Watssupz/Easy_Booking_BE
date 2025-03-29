@@ -13,7 +13,7 @@ namespace Easy_Booking_BE.Data
         #region DBSet
 
         public DbSet<Booking>? Booking { get; set; }
-        public DbSet<Booking_Room>? Booking_Roos { get; set; }
+        public DbSet<Booking_Room>? Booking_Rooms { get; set; }
         public DbSet<Booking_Status>? Booking_Status { get; set; }
         public DbSet<Feature>? Features { get; set; }
         public DbSet<Floor>? Floors { get; set; }

@@ -12,8 +12,8 @@ public class Booking
     public String user_id { get; set; }
     public DateTime start_date_booking { get; set; }
     public DateTime end_date_booking { get; set; }
-    public DateTime check_in  { get; set; }
-    public DateTime check_out  { get; set; }
+    public DateTime? check_in  { get; set; }
+    public DateTime? check_out  { get; set; }
     public int num_adults { get; set; }
     public int num_children { get; set; }
     public double price { get; set; }
