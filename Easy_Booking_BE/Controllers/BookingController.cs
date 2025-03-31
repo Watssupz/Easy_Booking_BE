@@ -50,6 +50,13 @@ namespace Easy_Booking_BE.Controllers
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
 
+        [HttpPost("confirm-booking/{booking_id}")]
+        public async Task<IActionResult> ConfirmBooking(int booking_id)
+        {
+            var response = await _bookingsRepository.ConfirmBookingAsync(booking_id);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
+        
         [HttpPost("cancel-booking/{booking_id}")]
         public async Task<IActionResult> CancelBooking(int booking_id)
         {

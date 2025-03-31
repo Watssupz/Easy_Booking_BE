@@ -190,6 +190,35 @@ public class BookingRepository : IBookingsRepository
         }
     }
 
+    public async Task<BaseDataResponse<object>> ConfirmBookingAsync(int booking_id)
+    {
+        try
+        {
+            var booking = await _context.Booking.FirstOrDefaultAsync(b => b.booking_id == booking_id);
+            if (booking == null)
+            {
+                return new BaseDataResponse<object>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            booking.booking_status = 2;
+            await _context.SaveChangesAsync();
+            return new BaseDataResponse<object>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL
+            );
+        }
+        catch (Exception e)
+        {
+            return new BaseDataResponse<object>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
+
     public async Task<BaseDataResponse<object>> CancelBookingAsync(int booking_id)
     {
         try
