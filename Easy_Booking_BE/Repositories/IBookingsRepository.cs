@@ -12,4 +12,7 @@ public interface IBookingsRepository
     public Task<BaseDataResponse<List<object>>> MyBookingAsync();
     public Task<BaseDataResponse<object>> CancelBookingAsync(int booking_id);
     public Task<BaseDataResponse<List<object>>> GetListBookingByRooms();
+    
+    public Task<BaseDataResponse<object>> GetBookingCountByStatus();
+    
 }

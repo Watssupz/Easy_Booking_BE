@@ -64,5 +64,12 @@ namespace Easy_Booking_BE.Controllers
             var response = await _bookingsRepository.GetListBookingByRooms();
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
+        [Authorize]
+        [HttpGet("get-bookingstatus")]
+        public async Task<IActionResult> GetBookingsStatus()
+        {
+            var response = await _bookingsRepository.GetBookingCountByStatus();
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
     }
 }
