@@ -9,6 +9,6 @@ public interface IBookingsRepository
     public Task<BaseDataResponse<List<BookingModel>>> GetAllBookingsAsync();
     public Task<BaseDataResponse<List<BookingModel>>> GetBookingByRoomIdAsync(int room_id);
     public Task<BaseDataResponse<object>> AddBookingAsync(BookingCreateModel booking);
-    // public Task<BaseDataResponse<object>> UpdateBookingAsync(int id, BookingModel booking);
-    // public Task<BaseDataResponse<object>> DeleteBookingAsync(int id);
+    public Task<BaseDataResponse<List<object>>> MyBookingAsync();
+    public Task<BaseDataResponse<object>> CancelBookingAsync(int booking_id);
 }

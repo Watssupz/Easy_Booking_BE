@@ -52,7 +52,7 @@ public class BookingRepository : IBookingsRepository
                 .Include(r => r.Room)
                 .Include(b => b.Booking)
                 .ThenInclude(p => p.Payment_Status)
-                .Where(r => r.Room.room_id == room_id && r.Booking.end_date_booking >= currentDate)
+                .Where(r => r.Room.room_id == room_id && r.Booking.end_date_booking >= currentDate && r.Booking.booking_status == 1)
                 .Select(n => new BookingModel()
                 {
                     booking_id = n.booking_id,
@@ -133,6 +133,81 @@ public class BookingRepository : IBookingsRepository
                 statusCode: 200,
                 message: Constants.SUCCESSFUL,
                 data: new { booking_id = newBooking.booking_id }
+            );
+        }
+        catch (Exception e)
+        {
+            return new BaseDataResponse<object>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
+
+    public async Task<BaseDataResponse<List<object>>> MyBookingAsync()
+    {
+        try
+        {
+            var userId = await _util.GetUserIdFromTokenAsync();
+            
+            var list_booking = await _context.Booking_Rooms
+                .Include(r => r.Room)
+                .Include(b => b.Booking)
+                .ThenInclude(p => p.Payment_Status)
+                .Where(r => r.Booking.user_id == userId)
+                .Select(n => new
+                {
+                    booking_id = n.booking_id,
+                    room_id = n.room_id,
+                    room_title = n.Room.room_number,
+                    location = n.Room.location,
+                    start_date_booking = n.Booking.start_date_booking,
+                    end_date_booking = n.Booking.end_date_booking,
+                    check_in = n.Booking.check_in,
+                    check_out = n.Booking.check_out,
+                    num_adults = n.Booking.num_adults,
+                    num_children = n.Booking.num_children,
+                    price = n.Booking.price,
+                    user_id = n.Booking.user_id,
+                    payment_status = n.Booking.Payment_Status.payment_status_name,
+                    booking_status = n.Booking.Booking_Status.booking_status_name,
+                    thumbnail = n.Room.thumbnail,
+                })
+                .ToListAsync();
+            var objectList = list_booking.Select(x => (object)x).ToList();
+            return new BaseDataResponse<List<object>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: objectList
+            );
+        }
+        catch (Exception e)
+        {
+            return new BaseDataResponse<List<object>>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
+
+    public async Task<BaseDataResponse<object>> CancelBookingAsync(int booking_id)
+    {
+        try
+        {
+            var booking = await _context.Booking.FirstOrDefaultAsync(b => b.booking_id == booking_id);
+            if (booking == null)
+            {
+                return new BaseDataResponse<object>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            booking.booking_status = 3;
+            await _context.SaveChangesAsync();
+            return new BaseDataResponse<object>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL
             );
         }
         catch (Exception e)
