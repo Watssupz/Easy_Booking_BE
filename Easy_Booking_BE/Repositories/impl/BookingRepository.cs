@@ -218,4 +218,61 @@ public class BookingRepository : IBookingsRepository
             );
         }
     }
+
+    public async Task<BaseDataResponse<List<object>>> GetListBookingByRooms()
+    {
+        try
+        {
+            var userId = await _util.GetUserIdFromTokenAsync();
+            if (userId == null)
+            {
+                return new BaseDataResponse<List<object>>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+            
+            var list_booking = await _context.Booking_Rooms
+                .Include(r => r.Room)
+                .Include(b => b.Booking)
+                .ThenInclude(p => p.Payment_Status)
+                .Where(r => r.Room.user_id == userId)
+                .Select(n => new
+                {
+                    booking_id = n.booking_id,
+                    room_id = n.room_id,
+                    room_title = n.Room.room_number,
+                    location = n.Room.location,
+                    start_date_booking = n.Booking.start_date_booking,
+                    end_date_booking = n.Booking.end_date_booking,
+                    check_in = n.Booking.check_in,
+                    check_out = n.Booking.check_out,
+                    num_adults = n.Booking.num_adults,
+                    num_children = n.Booking.num_children,
+                    price = n.Booking.price,
+                    user_id = n.Booking.user_id,
+                    username = _context.Users
+                        .Where(u => u.Id == n.Booking.user_id)
+                        .Select(u => u.first_name + " " + u.last_name)
+                        .FirstOrDefault() ?? "Unknown",
+                    payment_status = n.Booking.Payment_Status.payment_status_name,
+                    booking_status = n.Booking.Booking_Status.booking_status_name,
+                    thumbnail = n.Room.thumbnail,
+                })
+                .ToListAsync();
+            var objectList = list_booking.Select(x => (object)x).ToList();
+            return new BaseDataResponse<List<object>>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: objectList
+            );
+        }
+        catch (Exception e)
+        {
+            return new BaseDataResponse<List<object>>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
 }
