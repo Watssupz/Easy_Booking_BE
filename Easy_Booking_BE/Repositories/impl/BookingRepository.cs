@@ -345,12 +345,61 @@ public class BookingRepository : IBookingsRepository
                     message: Constants.NOT_FOUND
                 );
             }
+
             booking.check_out = DateTime.Now;
             await _context.SaveChangesAsync();
-            
+
             return new BaseDataResponse<object>(
                 statusCode: 200,
                 message: Constants.SUCCESSFUL
+            );
+        }
+        catch (Exception e)
+        {
+            return new BaseDataResponse<object>(
+                statusCode: 500,
+                message: Constants.ERROR
+            );
+        }
+    }
+
+    public async Task<BaseDataResponse<object>> GetBookingCountByStatus()
+    {
+        try
+        {
+            var userId = await _util.GetUserIdFromTokenAsync();
+             if (userId == null)
+            {
+                return new BaseDataResponse<object>(
+                    statusCode: 404,
+                    message: Constants.NOT_FOUND
+                );
+            }
+
+            var bookingCounts = await _context.Booking_Rooms
+                .Include(b => b.Booking)
+                .ThenInclude(bs => bs.Booking_Status)
+                .Where(r => r.Room.user_id == userId)
+                .GroupBy(b => b.Booking.Booking_Status.booking_status_name)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            // Tạo object kết quả với mặc định là 0 cho tất cả trạng thái
+            var result = new
+            {
+                Pending = bookingCounts.FirstOrDefault(x => x.Status == "Pending")?.Count ?? 0,
+                Confirmed = bookingCounts.FirstOrDefault(x => x.Status == "Confirmed")?.Count ?? 0,
+                Cancelled = bookingCounts.FirstOrDefault(x => x.Status == "Cancelled")?.Count ?? 0
+            };
+
+            return new BaseDataResponse<object>(
+                statusCode: 200,
+                message: Constants.SUCCESSFUL,
+                data: result
             );
         }
         catch (Exception e)
