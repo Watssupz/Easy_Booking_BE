@@ -71,5 +71,19 @@ namespace Easy_Booking_BE.Controllers
             var response = await _bookingsRepository.GetListBookingByRooms();
             return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
         }
+
+        [HttpGet("check-in/{booking_id}")]
+        public async Task<IActionResult> CheckIn(int booking_id)
+        {
+            var response = await _bookingsRepository.CheckInBooking(booking_id);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
+        
+        [HttpGet("check-out/{booking_id}")]
+        public async Task<IActionResult> CheckOut(int booking_id)
+        {
+            var response = await _bookingsRepository.CheckOutBooking(booking_id);
+            return response.StatusCode == 200 ? Ok(response) : BadRequest(response);
+        }
     }
 }
