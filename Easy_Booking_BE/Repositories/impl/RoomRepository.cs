@@ -170,6 +170,8 @@ public class RoomRepository : IRoomRepository
                 updateR.room_number = room.room_number;
                 updateR.description = room.description;
                 updateR.location = room.location;
+                updateR.num_bathrooms = room.num_bathrooms;
+                updateR.num_beds = room.num_beds;
                 updateR.price_per_night = room.price_per_night;
                 updateR.room_status_id = room.room_status_id;
 
