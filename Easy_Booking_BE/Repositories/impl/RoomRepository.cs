@@ -252,7 +252,20 @@ public class RoomRepository : IRoomRepository
 
     public async Task<BaseDataResponse<List<RoomModel>>> SearchRoomsByLocationAsync(RoomSearchModel model)
     {
-        var searchR = await _context.Room!.Where(r => r.location.Contains(model.location)).ToListAsync();
+        var query = _context.Room.AsQueryable();
+
+        query = query.Where(r => r.location.Contains(model.location));
+
+        if (model.minPrice.HasValue)
+        {
+            query = query.Where(r => r.price_per_night >= model.minPrice.Value);
+        }
+        if (model.maxPrice.HasValue)
+        {
+            query = query.Where(r => r.price_per_night <= model.maxPrice.Value);
+        }
+        var searchR = await query.ToListAsync();
+        
         var mappedData = _mapper.Map<List<RoomModel>>(searchR);
         if (searchR.Any())
         {
