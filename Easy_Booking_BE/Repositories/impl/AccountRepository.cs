@@ -81,7 +81,7 @@ namespace Easy_Booking_BE.Repositories
                 first_name = signUpModel.first_name,
                 last_name = signUpModel.last_name,
                 Email = signUpModel.email,
-                UserName = signUpModel.first_name + " " + signUpModel.last_name,
+                UserName = signUpModel.email,
                 PhoneNumber = signUpModel.phone_number
             };
             var result = await _userManager.CreateAsync(user, signUpModel.password);
